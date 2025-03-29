@@ -1,0 +1,63 @@
+const CategoryModel = require('../models/categoryModel');
+const slugify = require('slugify');
+const {asyncHandler}=require('../middlewares/asyncHandler');
+
+
+// @desc get list of categories
+// @route get /api/categories
+// @access public
+exports.getAllCategories=asyncHandler(async(req,res)=>{
+        const limit = +req.query.limit||2;
+        const page = +req.query.page||1;
+        const skip = limit*page-limit;
+        const categories = await CategoryModel.find().limit(limit).skip(skip);
+        if(!categories)
+                return res.status(404).json({status:"FAIL",data:{categories:"there is no categories yet"}});
+        res.status(200).json({status:"SUCCESS",page:page,data:{categories}});
+});
+
+
+// @desc get specific category
+// @route get /api/categories/:id
+// @access public
+exports.getCategory=asyncHandler(async(req,res)=>{
+        const id = +req.query.id;
+        const category = await CategoryModel.findById(id);
+        if(!category)
+                return res.status(404).json({status:"FAIL",msg:"category not found"});
+        res.status(200).json({status:"SUCCESS",data:{category}});
+});
+
+
+// @desc creat new category
+// @route post /api/categories
+// @access private
+exports.createCategory= asyncHandler(async(req,res)=>{
+        const {name} = req.body;
+        const newCategory = new CategoryModel({name,slug:slugify(name)})
+        await newCategory.save();
+        res.status(201).json({status:"SUCCESS",data:{newCategory}})
+});
+
+// @desc update specific category
+// @route put /api/categories/:id
+// @access private
+exports.UpdateCategory=asyncHandler(async(req,res)=>{
+        const id = +req.query.id;
+        const name=req.body.name;
+        const newCategory = await CategoryModel.findByIdAndUpdate(id,{name,slug:slugify(name)},{new:true});
+        if(!newCategory)
+                return res.status(404).json({status:"FAIL",msg:"category not found"});
+        res.status(200).json({status:"SUCCESS",data:{newCategory}});
+});
+
+// @desc delete category by id
+// @route delete /api/categories
+// @access private 
+exports.deleteCategory=asyncHandler(async(req,res)=>{
+        const id = +req.query.id;
+        const deletedCategory = await CategoryModel.findByIdAndDelete(id);
+        if(!deletedCategory)
+                return res.status(404).json({status:"FAIL",data:{categories:"category not found"}});
+        res.status(200).json({status:"SUCCESS",msg:"deleted"});
+});
