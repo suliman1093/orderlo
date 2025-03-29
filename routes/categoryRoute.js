@@ -11,9 +11,9 @@ const router = express.Router();
 
 router.route("/").post(createCategory)
                 .get(getAllCategories)
-                .delete(deleteCategory);
+                
 
 router.route("/:id").get(getCategory)
-                .put(UpdateCategory);                
-
+                .put(UpdateCategory)                
+                .delete(deleteCategory);
 module.exports = router;
