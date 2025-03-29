@@ -23,9 +23,6 @@ exports.getAllCategories=asyncHandler(async(req,res,next)=>{
 // @access public
 exports.getCategory=asyncHandler(async(req,res,next)=>{
         const id = req.params.id;
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-                return next(new globalErrorHandler("Invalid ID format", 400));
-        }
         const category = await CategoryModel.findById(id);
         if(!category)
                 return next(new globalErrorHandler("category not found",404));
