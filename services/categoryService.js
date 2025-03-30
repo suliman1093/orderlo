@@ -1,8 +1,9 @@
-const CategoryModel = require('../models/categoryModel');
+
 const slugify = require('slugify');
+const CategoryModel=require('../models/categoryModel');
 const {asyncHandler}=require('../middlewares/asyncHandler');
-const globalErrorHandler = require('../utils/apiError');
-const mongoose = require('mongoose')
+const GlobalErrorHandler = require('../utils/apiError');
+
 
 // @desc get list of categories
 // @route get /api/categories
@@ -13,7 +14,7 @@ exports.getAllCategories=asyncHandler(async(req,res,next)=>{
         const skip = limit*page-limit;
         const categories = await CategoryModel.find().limit(limit).skip(skip);
         if(!categories)
-                return next(new globalErrorHandler("there is no categories yet",404));
+                return next(new GlobalErrorHandler("there is no categories yet",404));
         res.status(200).json({status:"SUCCESS",page:page,data:{categories}});
 });
 
@@ -22,10 +23,10 @@ exports.getAllCategories=asyncHandler(async(req,res,next)=>{
 // @route get /api/categories/:id
 // @access public
 exports.getCategory=asyncHandler(async(req,res,next)=>{
-        const id = req.params.id;
+        const {id} = req.params;
         const category = await CategoryModel.findById(id);
         if(!category)
-                return next(new globalErrorHandler("category not found",404));
+                return next(new GlobalErrorHandler("category not found",404));
         res.status(200).json({status:"SUCCESS",data:{category}});
 });
 
@@ -44,16 +45,12 @@ exports.createCategory= asyncHandler(async(req,res)=>{
 // @route put /api/categories/:id
 // @access private
 exports.UpdateCategory=asyncHandler(async(req,res,next)=>{
-        const id = req.params.id;
-        const name=req.body.name;
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-                return next(new globalErrorHandler("Invalid ID format", 400));
-        }
+        const {id} = req.params;
+        const {name} = req.body;
 
         const newCategory = await CategoryModel.findByIdAndUpdate(id,{name,slug:slugify(name)},{new:true});
         if(!newCategory)
-                return next(new globalErrorHandler("category not found",404));
+                return next(new GlobalErrorHandler("category not found",404));
         res.status(200).json({status:"SUCCESS",data:{newCategory}});
 });
 
@@ -61,13 +58,9 @@ exports.UpdateCategory=asyncHandler(async(req,res,next)=>{
 // @route delete /api/categories
 // @access private 
 exports.deleteCategory=asyncHandler(async(req,res,next)=>{
-        const id = req.params.id;
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-                return next(new globalErrorHandler("Invalid ID format", 400));
-        }
+        const {id} = req.params;
         const deletedCategory = await CategoryModel.findByIdAndDelete(id);
         if(!deletedCategory)
-                return next(new globalErrorHandler("category not found",404));
+                return next(new GlobalErrorHandler("category not found",404));
         res.status(200).json({status:"SUCCESS",msg:"deleted"});
 });

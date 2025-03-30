@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const dbconnection = require('./config/database');
 const categoryRoute= require('./routes/categoryRoute');
+const subCategoryRoute= require('./routes/subCategoryRoute');
+const brandRoute= require('./routes/brandRoute');
 const {routeMidlewareHandler}=require('./middlewares/routeMidlewareHandler');
 const ApiError = require('./utils/apiError');
 const globalErrorHandler = require('./middlewares/globalErrorHandler')
@@ -23,7 +25,7 @@ app.listen(PORT,()=>{
 
 /* ============= middlewares ============== */
 app.use(express.json());
-if(process.env.NODE_ENV=='development'){// run the logger just in dev mode
+if(process.env.NODE_ENV==='development'){// run the logger just in dev mode
     app.use(morgan('dev'));}; // request logger
 
 
@@ -32,7 +34,8 @@ if(process.env.NODE_ENV=='development'){// run the logger just in dev mode
 
 /* ============= routes ============== */
 app.use("/api/categories",categoryRoute);
-
+app.use("/api/subcategories",subCategoryRoute);
+app.use("/api/brands",brandRoute);
 
 /* ============= route not found middleware handler ============== */
 app.all("*",routeMidlewareHandler);
