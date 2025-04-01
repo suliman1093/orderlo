@@ -27,7 +27,7 @@ exports.createProductValidator=[
     body('price')
     .notEmpty().withMessage('price required')
     .isNumeric().withMessage('price must be a number')
-    .isLength({max:32}).withMessage('too long price'),
+    .isFloat({ min: 1 }).withMessage('too low price'),
 
 
     body('priceAfterDiscount')
@@ -97,8 +97,7 @@ exports.createProductValidator=[
     body('ratingsAverage')
     .optional()
     .isNumeric()
-    .isLength({min:1}).withMessage('min rating average is 1')
-    .isLength({max:5}).withMessage('max rating average is 5'),
+    .isFloat({ min: 1, max: 5 }).withMessage('max rating average is 1->5'),
 
 
     body('ratingsQuantity')
