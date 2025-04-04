@@ -2,23 +2,31 @@ const slugify = require('slugify');
 const SubCategoryModel = require('../models/subCategoryModel');
 const {asyncHandler}=require('../middlewares/asyncHandler');
 const GlobalErrorHandler = require('../utils/apiError');
-
+const ApiFeatures = require('../utils/apiFeatures');
 
 // @desc get list of subcategories
 // @route get /api/subcategories
 // @access public
 exports.getAllSubCategories=asyncHandler(async(req,res,next)=>{
-        console.log(req.params.categoryId);
+
+        const countDocs = await SubCategoryModel.countDocuments();
+        const apiFeatures = new ApiFeatures(SubCategoryModel.find(), req.query)
+        .search(SubCategoryModel)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate(countDocs)
+        .buildQuery();
+        const {paginateResult , mongooseQuery} = apiFeatures;
+
         let filter = {};
         if(req.params.categoryId)
                 filter = {category:req.params.categoryId}
-        const limit = +req.query.limit||2;
-        const page = +req.query.page||1;
-        const skip = limit*page-limit;
-        const subCategories = await SubCategoryModel.find(filter).limit(limit).skip(skip);
+
+        const subCategories = await mongooseQuery.find(filter);
         if(!subCategories)
                 return next(new GlobalErrorHandler("there is no subcategories yet",404));
-        res.status(200).json({status:"SUCCESS",page:page,data:{subCategories}});
+        res.status(200).json({status:"SUCCESS",paginateResult,data:{subCategories}});
 });
 
 

@@ -3,19 +3,28 @@ const slugify = require('slugify');
 const CategoryModel=require('../models/categoryModel');
 const {asyncHandler}=require('../middlewares/asyncHandler');
 const GlobalErrorHandler = require('../utils/apiError');
+const ApiFeatures = require('../utils/apiFeatures');
 
 
 // @desc get list of categories
 // @route get /api/categories
 // @access public
 exports.getAllCategories=asyncHandler(async(req,res,next)=>{
-        const limit = +req.query.limit||2;
-        const page = +req.query.page||1;
-        const skip = limit*page-limit;
-        const categories = await CategoryModel.find().limit(limit).skip(skip);
+        const countDocs = await CategoryModel.countDocuments();
+        const apiFeatures = new ApiFeatures(CategoryModel.find(), req.query)
+        .search(CategoryModel)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate(countDocs)
+        .buildQuery();
+        
+        const {paginateResult , mongooseQuery} = apiFeatures;
+        const categories = await mongooseQuery;
+
         if(!categories)
                 return next(new GlobalErrorHandler("there is no categories yet",404));
-        res.status(200).json({status:"SUCCESS",page:page,data:{categories}});
+        res.status(200).json({status:"SUCCESS",paginateResult,data:{categories}});
 });
 
 

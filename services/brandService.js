@@ -2,18 +2,25 @@ const slugify = require('slugify');
 const BrandModel=require('../models/brandModel');
 const {asyncHandler}=require('../middlewares/asyncHandler');
 const GlobalErrorHandler = require('../utils/apiError');
+const ApiFeatures = require('../utils/apiFeatures');
 
 // @desc get list of brands
 // @route get /api/brands
 // @access public
 exports.getAllBrands=asyncHandler(async(req,res,next)=>{
-    const limit = +req.query.limit||2;
-    const page = +req.query.page||1;
-    const skip = limit*page-limit;
-    const Brands = await BrandModel.find().limit(limit).skip(skip);
-    if(!Brands)
-            return next(new GlobalErrorHandler("there is no brands yet",404));
-    res.status(200).json({status:"SUCCESS",page:page,data:{Brands}});
+        const countDocs = await BrandModel.countDocuments();
+        const apiFeatures = new ApiFeatures(BrandModel.find(), req.query)
+        .search(BrandModel)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate(countDocs)
+        .buildQuery();
+        const {paginateResult , mongooseQuery} = apiFeatures;
+        const Brands = await mongooseQuery;
+        if(!Brands)
+                return next(new GlobalErrorHandler("there is no brands yet",404));
+        res.status(200).json({status:"SUCCESS",result:paginateResult,data:{Brands}});
 });
 
 

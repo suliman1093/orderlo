@@ -2,18 +2,30 @@ const slugify = require('slugify');
 const ProductModel=require('../models/productModel');
 const {asyncHandler}=require('../middlewares/asyncHandler');
 const GlobalErrorHandler = require('../utils/apiError');
-
+const ApiFeatures = require('../utils/apiFeatures');
 // @desc get list of products
 // @route get /api/products
 // @access public
 exports.getAllProducts=asyncHandler(async(req,res,next)=>{
-        const limit = +req.query.limit||2;
-        const page = +req.query.page||1;
-        const skip = limit*page-limit;
-        const products = await ProductModel.find().limit(limit).skip(skip);
+
+        const countDocs = await ProductModel.countDocuments();
+        console.log(countDocs);
+        
+        const apiFeatures = new ApiFeatures(ProductModel.find(), req.query)
+        .search(ProductModel)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate(countDocs)
+        .buildQuery();
+
+        const {paginateResult , mongooseQuery} = apiFeatures;
+        const products = await mongooseQuery;
+
+        
         if(!products)
                 return next(new GlobalErrorHandler("there is no products yet",404));
-        res.status(200).json({status:"SUCCESS",page:page,data:{products}});
+        res.status(200).json({status:"SUCCESS",result:paginateResult,data:{products}});
 });
 
 
