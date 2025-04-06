@@ -1,9 +1,12 @@
 const express = require('express');
+
+
+
 const {createCategory,
         getAllCategories,
         getCategory,
         UpdateCategory,
-        deleteCategory} = require('../services/categoryService');
+        deleteCategory,uploadCategoryImage,reSizeImages} = require('../services/categoryService');
 const { getCategoryValidator,
         createCategoryValidator,
         updateCategoryValidator,
@@ -12,16 +15,18 @@ const subCategoryRoute= require('./subCategoryRoute');
 
 const router = express.Router();
 
+
+
 // nested route
 // to access sub categories if we have this route from category
 router.use('/:categoryId/subcategories',subCategoryRoute);
 
 
-router.route("/").post(createCategoryValidator,createCategory)
+router.route("/").post(uploadCategoryImage,reSizeImages,createCategoryValidator, createCategory)
                 .get(getAllCategories)
                 
 
 router.route("/:id").get(getCategoryValidator,getCategory)
-                .put(updateCategoryValidator,UpdateCategory)                
+                .put(uploadCategoryImage,reSizeImages,updateCategoryValidator,UpdateCategory)                
                 .delete(deleteCategoryValidator,deleteCategory);
 module.exports = router;

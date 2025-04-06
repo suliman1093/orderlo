@@ -1,5 +1,27 @@
+const sharp = require('sharp');
+const { v4: uuidv4 } = require('uuid');
 const BrandModel=require('../models/brandModel');
 const Factory = require('./handlersFactory');
+const {uploadSingleImage} = require('../middlewares/uploadImageMiddleware');
+
+
+//1-)brand image upload
+exports.uploadBrandImage = uploadSingleImage('image');
+
+
+//2-)image proccecing before save the image 
+exports.reSizeImages= async(req,res,next)=>{
+    if(req.file){
+    const fileName = `brand-${uuidv4()}-${Date.now()}.jpeg`
+    await sharp(req.file.buffer)
+    .resize(1000,1000)
+    .toFormat('jpeg')
+    .toFile(`uploads/brands/${fileName}`);
+    req.body.image = fileName;}
+    next();
+}
+
+//3-) handlers
 
 // @desc get list of brands
 // @route get /api/brands

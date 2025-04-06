@@ -1,5 +1,49 @@
+const sharp = require('sharp');
+const { v4: uuidv4 } = require('uuid');
+const multer  = require('multer');
 const ProductModel=require('../models/productModel');
 const Factory = require('./handlersFactory');
+const ApiError = require('../utils/apiError');
+const { uploadMixOfImages } = require('../middlewares/uploadImageMiddleware');
+
+//1-)product images upload
+
+exports.uploadProductImages = uploadMixOfImages(
+    { name: "imageCover", maxCount: 1 },
+    { name: "images", maxCount: 5 }
+);
+
+exports.reSizeProductImages= async(req,res,next)=>{
+    // image proccecing for image cover
+    if(req.files.imageCover){
+    const ImageCoverfileName = `product-${uuidv4()}-${Date.now()}-cover.jpeg`
+    await sharp(req.files.imageCover[0].buffer)
+    .resize(1000,1000)
+    .toFormat('jpeg')
+    .toFile(`uploads/products/${ImageCoverfileName}`);
+    req.body.imageCover = ImageCoverfileName;}
+
+    //image proccecing for product images
+    if(req.files.images){
+        const images=[];
+        
+        await Promise.all(req.files.images.map(async(image,index)=>{
+            const ImagefileName = `product-${uuidv4()}-${Date.now()}-${index}.jpeg`
+            await sharp(image.buffer)
+            .resize(1000,1000)
+            .toFormat('jpeg')
+            .toFile(`uploads/products/${ImagefileName}`);
+            images.push(ImagefileName);
+        }))
+        
+        req.body.images = images;
+    }
+
+    next();
+    
+}
+
+
 
 
 

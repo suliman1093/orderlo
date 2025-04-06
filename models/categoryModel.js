@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const CategorySchema = new mongoose.Schema({
     name:{
@@ -17,6 +20,22 @@ const CategorySchema = new mongoose.Schema({
         type:String,
     }
 },{timestamps:true});
+
+// get one && get all && update
+CategorySchema.post('init',(doc)=>{
+    if(doc.image){
+        const imageUrl =`${process.env.BASE_URL}/categories/${doc.image}`;
+        doc.image = imageUrl;
+    }
+})
+
+//create
+CategorySchema.post('save',(doc)=>{
+    if(doc.image){
+        const imageUrl =`${process.env.BASE_URL}/categories/${doc.image}`;
+        doc.image = imageUrl;
+    }
+})
 
 const CategoryModel = mongoose.model("Category",CategorySchema);
 module.exports= CategoryModel;
