@@ -8,8 +8,8 @@ const categoryRoute= require('./routes/categoryRoute');
 const subCategoryRoute= require('./routes/subCategoryRoute');
 const brandRoute= require('./routes/brandRoute');
 const productRoute= require('./routes/productRoute');
+const userRoute= require('./routes/userRoute');
 const {routeMidlewareHandler}=require('./middlewares/routeMidlewareHandler');
-const ApiError = require('./utils/apiError');
 const globalErrorHandler = require('./middlewares/globalErrorHandler')
 /* ============= config env ============== */
 dotenv.config();
@@ -40,6 +40,7 @@ app.use("/api/categories",categoryRoute);
 app.use("/api/subcategories",subCategoryRoute);
 app.use("/api/brands",brandRoute);
 app.use("/api/products",productRoute);
+app.use("/api/users",userRoute);
 
 /* ============= route not found middleware handler ============== */
 app.all("*",routeMidlewareHandler);
