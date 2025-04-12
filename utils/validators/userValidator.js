@@ -88,6 +88,32 @@ exports.updateUserValidator=[
     validatorMiddleware
 ];
 
+exports.updateLoggedUserValidator=[
+    body('name')
+    .notEmpty().withMessage('user required')
+    .isLength({min:3}).withMessage('too short user name')
+    .isLength({max:32}).withMessage('too long user name').custom((name,{req})=>{
+            req.body.slug = slugify(name);
+            return true;
+    }),
+
+
+    body('email')
+    .notEmpty().withMessage('email required')
+    .isEmail().withMessage('must be a valid email').custom(async(email)=>{
+        const isFound = await UserModler.findOne({email})
+        if(isFound) 
+            throw new ApiError('email already used',400);
+        return true
+        
+    }),
+
+
+    body('profileImg')
+    .optional(),
+    validatorMiddleware
+];
+
 
 exports.changeUserPasswordValidator=[
     param('id').isMongoId().withMessage('unvalid mongo id'),
@@ -109,6 +135,33 @@ exports.changeUserPasswordValidator=[
         if(!user)
             throw new ApiError('user not found',404);
         const isMatched = await bcrypt.compare(currentPassword,user.password);
+        if(!isMatched){
+            throw new ApiError('currentPassword not true',400);}
+        return true;
+    }),
+
+    body('passwordConfirm')
+    .notEmpty().withMessage('passwordConfirm required'),
+    validatorMiddleware
+];
+
+exports.changeLoggedUserPasswordValidator=[
+    body('newPassword')
+    .notEmpty().withMessage('newPassword required')
+    .isLength({min:8}).withMessage('newPassword must be more than 8')
+    .isLength({max:32}).withMessage('newPassword must be less than 32')
+    .custom((newPassword,{req})=>{;
+        if(newPassword!== req.body.passwordConfirm){
+            throw new ApiError('newPassword and passwordConfirm not matched',400);}
+        return true;
+    }),
+
+    body('currentPassword')
+    .notEmpty().withMessage('currentPassword required')
+    .custom(async(currentPassword,{req})=>{
+        if(!req.user)
+            throw new ApiError('user not found',404);
+        const isMatched = await bcrypt.compare(currentPassword,req.user.password);
         if(!isMatched){
             throw new ApiError('currentPassword not true',400);}
         return true;

@@ -23,8 +23,13 @@ const UserSchema = new mongoose.Schema({
         type:String,
         require:[true,'password is required'],
         minlength:[8,'too short password '],
-        maxlength:[32,'too long password '],
     },
+
+    passwordChangedAt:Date,
+    passwordResetCode:String,
+    passwordResetExp:Date,
+    passwordResetCodeVerifiy:Boolean,
+
     profileImg:{
         type:String,
     },

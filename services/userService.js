@@ -35,12 +35,23 @@ exports.getAllUsers=Factory.GetAll(UserModler,"UserModler");
 // @access private
 exports.getUser=Factory.GetOne(UserModler);
 
+
+// @desc get logged user data ( without password)
+// @route get /api/users/myData
+// @access private
+exports.getLoggedUser=asyncHandler(async(req,res,next)=>{
+    
+    req.params.id = req.user._id;
+    next();
+
+})
+
 // @desc creat new user
 // @route post /api/users
 // @access private
 exports.createUser= Factory.CreateOne(UserModler);
 
-// @desc update specific user
+// @desc update specific user by admin
 // @route put /api/users/:id
 // @access private
 exports.UpdateUser=asyncHandler(async(req,res,next)=>{
@@ -57,6 +68,26 @@ exports.UpdateUser=asyncHandler(async(req,res,next)=>{
         res.status(200).json({status:"SUCCESS",data:{newDoc}});
     })
 
+// @desc update logged user data ( without password and role)
+// @route put /api/users/updateMe
+// @access private
+exports.UpdateLoggedUser=asyncHandler(async(req,res,next)=>{
+
+    const newDoc = await UserModler.findByIdAndUpdate(req.user._id,{
+        name:req.body.name,
+        slug:req.body.slug,
+        email:req.body.email,
+        profileImg:req.body.profileImg,
+    },{new:true});
+    if(!newDoc)
+            return next(new GlobalErrorHandler("Doc not found",404));
+    res.status(200).json({status:"SUCCESS",data:{newDoc}});
+})
+
+
+// @desc update specific user password
+// @route put /api/users/changepassword/:id
+// @access private
 exports.UpdateUserPassword=asyncHandler(async(req,res,next)=>{
     const newDoc = await UserModler.findByIdAndUpdate(req.params.id,{
         password:await bcrypt.hash(req.body.newPassword,12),
@@ -66,7 +97,35 @@ exports.UpdateUserPassword=asyncHandler(async(req,res,next)=>{
     res.status(200).json({status:"SUCCESS",data:{newDoc}});
 })
 
+// @desc update logged user password
+// @route put /api/users/changeMyPassword
+// @access private
+exports.UpdateLoggedUserPassword=asyncHandler(async(req,res,next)=>{
+    // update password
+    const newDoc = await UserModler.findByIdAndUpdate(req.user._id,{
+        password:await bcrypt.hash(req.body.newPassword,12),
+    },{new:true});
+    if(!newDoc)
+            return next(new GlobalErrorHandler("Doc not found",404));
+    res.status(200).json({status:"SUCCESS",data:{newDoc}});
+})
+
+
 // @desc delete user by id
 // @route delete /api/users
 // @access private 
 exports.deleteUser=Factory.DeleteOne(UserModler);
+
+
+// @desc de active logged user
+// @route delete /api/users/deactiveMe
+// @access private
+exports.deactiveLoggedUser=asyncHandler(async(req,res,next)=>{
+    // deavtive
+    const newDoc = await UserModler.findByIdAndUpdate(req.user._id,{
+        active:false,
+    },{new:true});
+    if(!newDoc)
+            return next(new GlobalErrorHandler("user not found",404));
+    res.status(200).json({status:"SUCCESS"});
+})
