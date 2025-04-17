@@ -12,6 +12,7 @@ const userRoute= require('./routes/userRoute');
 const authRoute= require('./routes/authRoute');
 const reviewRoute= require('./routes/reviewRoute');
 const favoritesRoute= require('./routes/favoritesRoute');
+const addressRoute= require('./routes/addressRoute');
 const {routeMidlewareHandler}=require('./middlewares/routeMidlewareHandler');
 const globalErrorHandler = require('./middlewares/globalErrorHandler')
 /* ============= config env ============== */
@@ -47,6 +48,7 @@ app.use("/api/users",userRoute);
 app.use("/api/auth",authRoute);
 app.use("/api/reviews",reviewRoute);
 app.use("/api/favorites",favoritesRoute);
+app.use("/api/addresses",addressRoute);
 /* ============= route not found middleware handler ============== */
 app.all("*",routeMidlewareHandler);
 
