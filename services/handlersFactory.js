@@ -5,9 +5,10 @@ const ApiFeatures = require('../utils/apiFeatures');
 exports.DeleteOne= (Model)=>
     asyncHandler(async(req,res,next)=>{
         const {id} = req.params;
-        const deletedDoc = await Model.findByIdAndDelete(id);
-        if(!deletedDoc)
+        const Doc = await Model.findById(id);
+        if(!Doc)
                 return next(new GlobalErrorHandler("Doc not found",404));
+        await Doc.deleteOne();
         res.status(200).json({status:"SUCCESS",msg:"deleted"});
     });
 
@@ -17,6 +18,7 @@ exports.UpdateOne= (Model)=>
         const newDoc = await Model.findByIdAndUpdate(req.params.id,req.body,{new:true});
         if(!newDoc)
                 return next(new GlobalErrorHandler("Doc not found",404));
+        newDoc.save();
         res.status(200).json({status:"SUCCESS",data:{newDoc}});
     });
 
@@ -27,10 +29,13 @@ exports.CreateOne= (Model)=>
         res.status(201).json({status:"SUCCESS",data:{newDoc}})
     });
 
-exports.GetOne= (Model)=>
+exports.GetOne= (Model,populationOps)=>
     asyncHandler(async(req,res,next)=>{
         const {id} = req.params;
-        const Doc = await Model.findById(id);
+        let query = Model.findById(id);
+
+        if(populationOps) query=query.populate(populationOps);
+        const Doc = await query;
         if(!Doc)
                 return next(new GlobalErrorHandler("Doc not found",404));
         res.status(200).json({status:"SUCCESS",data:{Doc}});
@@ -41,7 +46,6 @@ exports.GetAll= (Model, modelName)=>
         let filterObj = {};
         if(req.filteration){
             filterObj = req.filteration;
-            console.log(filterObj);
         };
         const countDocs = await Model.countDocuments();
         const apiFeatures = new ApiFeatures(Model.find(filterObj), req.query)

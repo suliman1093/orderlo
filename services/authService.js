@@ -1,4 +1,3 @@
-const { default: mongoose } = require('mongoose');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -23,7 +22,8 @@ exports.signup=asyncHandler(async(req,res,next)=>{
         password:req.body.password,
     });
     //generate token
-    const token = jwt.sign({userId:req.body._id},process.env.JWT_SECRET_KEY,{expiresIn:"10m"});
+    
+    const token = jwt.sign({userId:user._id},process.env.JWT_SECRET_KEY,{expiresIn:"10m"});
     res.status(200).json({status:"SUCCESS",data:{user},token:token});
 
 })
@@ -141,6 +141,7 @@ exports.protect=asyncHandler(async(req,res,next)=>{
     const token = req.headers.authorization.split(' ')[1];
     //2)- verify the token (no change happened - expired token)
     const decoded =jwt.verify(token,process.env.JWT_SECRET_KEY)
+    console.log(decoded);
     
 
     

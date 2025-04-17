@@ -1,9 +1,7 @@
 const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
-const multer  = require('multer');
 const ProductModel=require('../models/productModel');
 const Factory = require('./handlersFactory');
-const ApiError = require('../utils/apiError');
 const { uploadMixOfImages } = require('../middlewares/uploadImageMiddleware');
 
 //1-)product images upload
@@ -56,7 +54,7 @@ exports.getAllProducts=Factory.GetAll(ProductModel,"ProductModel");
 // @desc get specific product
 // @route get /api/product/:id
 // @access public
-exports.getProduct=Factory.GetOne(ProductModel);
+exports.getProduct=Factory.GetOne(ProductModel,"reviews");
 
 
 // @desc creat new product

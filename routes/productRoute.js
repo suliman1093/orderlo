@@ -1,4 +1,5 @@
 const express = require('express');
+const reviewRoute = require("./reviewRoute");
 const {createProduct,
     getAllProducts,
     getProduct,
@@ -13,6 +14,11 @@ const {createProduct,
 const { protect ,allowTo } = require('../services/authService');
 
 const router = express.Router();
+
+// nested route
+// to access reviews of a product
+router.use('/:productId/reviews',reviewRoute);
+
 
 router.route("/").post(protect
                         ,allowTo("admin")
