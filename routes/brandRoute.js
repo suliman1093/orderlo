@@ -15,7 +15,6 @@ const { protect ,allowTo } = require('../services/authService');
 
 
 const router = express.Router();
-router.use(protect);
 
 
 router.route("/").post(protect

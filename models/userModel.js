@@ -41,8 +41,11 @@ const UserSchema = new mongoose.Schema({
     active:{
         type:Boolean,
         default:true
-    }
-    
+    },
+    favorites:[{
+        type:mongoose.Schema.ObjectId,
+        ref:"Product"
+    }]
 
 },{timestamps:true});
 

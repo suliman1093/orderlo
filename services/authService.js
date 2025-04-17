@@ -141,9 +141,6 @@ exports.protect=asyncHandler(async(req,res,next)=>{
     const token = req.headers.authorization.split(' ')[1];
     //2)- verify the token (no change happened - expired token)
     const decoded =jwt.verify(token,process.env.JWT_SECRET_KEY)
-    console.log(decoded);
-    
-
     
     if(!decoded) return next(new GlobalErrorHandler('unvalid token',401));
 
