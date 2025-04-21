@@ -57,6 +57,7 @@ exports.addProductToCart=asyncHandler(async(req,res,next)=>{
 
     // set total price to cart
     cart.totalPrice=calcTotalPrice(cart);
+    cart.totalPriceAfterDiscount=undefined;
 
     // save cart
     await cart.save();
@@ -79,6 +80,7 @@ exports.RemoveProductFromCart=asyncHandler(async(req,res,next)=>{
     
     // set total price to cart
     cart.totalPrice=calcTotalPrice(cart);
+    cart.totalPriceAfterDiscount=undefined;
 
     // save cart
     await cart.save();
@@ -111,6 +113,7 @@ exports.updateCartItemQuantity=asyncHandler(async(req,res,next)=>{
     
     // set total price to cart
     cart.totalPrice=calcTotalPrice(cart);
+    cart.totalPriceAfterDiscount=undefined;
 
     // save cart
     await cart.save();
@@ -165,7 +168,7 @@ exports.applyCouponToCart=asyncHandler(async(req,res,next)=>{
         if(!couponExist)  return next(new GlobalErrorHandler("coupon not found or expired",404));
         
         const newPrice = cart.totalPrice - ((cart.totalPrice*couponExist.discount)/100);
-        cart.totalPriceAfterDiscount=newPrice
+        cart.totalPriceAfterDiscount=newPrice;
 
         // save cart
         await cart.save();

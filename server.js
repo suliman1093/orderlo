@@ -15,6 +15,7 @@ const favoritesRoute= require('./routes/favoritesRoute');
 const addressRoute= require('./routes/addressRoute');
 const couponRoute= require('./routes/couponRoute');
 const cartRoute= require('./routes/cartRoute');
+const orderRoute= require('./routes/orderRoute');
 const {routeMidlewareHandler}=require('./middlewares/routeMidlewareHandler');
 const globalErrorHandler = require('./middlewares/globalErrorHandler')
 /* ============= config env ============== */
@@ -53,6 +54,7 @@ app.use("/api/favorites",favoritesRoute);
 app.use("/api/addresses",addressRoute);
 app.use("/api/coupons",couponRoute);
 app.use("/api/cart",cartRoute);
+app.use("/api/orders",orderRoute);
 /* ============= route not found middleware handler ============== */
 app.all("*",routeMidlewareHandler);
 

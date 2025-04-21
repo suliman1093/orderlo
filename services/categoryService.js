@@ -5,6 +5,7 @@ const Factory = require('./handlersFactory');
 const {uploadSingleImage} = require('../middlewares/uploadImageMiddleware');
 
 
+
 //1-)category image upload
 exports.uploadCategoryImage = uploadSingleImage('image');
 
